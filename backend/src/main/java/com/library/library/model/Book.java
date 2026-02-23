@@ -20,16 +20,33 @@ public class Book {
     @Column(nullable = false)
     private String category; // e.g., Science, Literature, etc.
 
+    @Column(unique = true, nullable = false)
+    private String isbn; // unique ISBN number
+
+    @Column
+    private String imageUrl; // URL for the book cover image
+
+    @Column(nullable = false)
+    private int quantity; // total copies in library
+
+    @Column(nullable = false)
+    private int available; // copies currently available
+
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Emprunt> emprunts;
 
     // Constructors
     public Book() {}
 
-    public Book(String title, String author, String category) {
+    public Book(String title, String author, String category, String isbn,
+                String imageUrl, int quantity, int available) {
         this.title = title;
         this.author = author;
         this.category = category;
+        this.isbn = isbn;
+        this.imageUrl = imageUrl;
+        this.quantity = quantity;
+        this.available = available;
     }
 
     // Getters & Setters
@@ -44,6 +61,18 @@ public class Book {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public int getAvailable() { return available; }
+    public void setAvailable(int available) { this.available = available; }
 
     public List<Emprunt> getEmprunts() { return emprunts; }
     public void setEmprunts(List<Emprunt> emprunts) { this.emprunts = emprunts; }
