@@ -18,7 +18,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
+import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 function calcStrength(pwd) {
   let score = 0;
   if (pwd.length >= 8) score++;
@@ -34,6 +35,9 @@ const STRENGTH_COLORS = ['', '#f44336', '#ff9800', '#2196f3', '#4caf50'];
 export default function ResetPassword() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+const [searchParams] = useSearchParams();
+const token = searchParams.get("token");
   const [form, setForm] = useState({ newPassword: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -57,17 +61,32 @@ export default function ResetPassword() {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    // POST /api/auth/reset-password  { token: fromURL, newPassword }
-    console.log('Reset password payload:', { newPassword: form.newPassword });
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
-    setSuccess(true);
-  };
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
 
+  try {
+    setLoading(true);
+
+    const response = await axios.post(
+      "http://localhost:8090/api/password/reset-password",
+      {
+        token: token,
+        newPassword: form.newPassword,
+      }
+    );
+
+    setSuccess(true);
+  } catch (error) {
+    console.error("FULL ERROR:", error);
+console.error("Response:", error.response);
+console.error("Data:", error.response?.data);
+console.error("Status:", error.response?.status);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       <CssBaseline />

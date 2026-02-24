@@ -4,15 +4,18 @@ import com.library.library.model.User;
 import com.library.library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
-
 @Service
 public class UserService {
+
+     @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     private UserRepository userRepository;
@@ -22,6 +25,21 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public void sendResetEmail(String email, String token) {
+        // Reset link with JWT token
+        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setFrom("jpfdjxymjg72@melbourne.edu.pl");
+        message.setSubject("Reset Your Password");
+        message.setText("Click the link to reset your password: " + resetLink);
+        mailSender.send(message);
     }
 
     public User getUserById(Long id) {

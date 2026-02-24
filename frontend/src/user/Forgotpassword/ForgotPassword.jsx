@@ -15,7 +15,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
-
+import axios from "axios"
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -29,16 +29,30 @@ export default function ForgotPassword() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    // POST /api/auth/forgot-password  { email }
-    console.log('Forgot password payload:', { email });
-    await new Promise((r) => setTimeout(r, 900));
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
+
+  setLoading(true);
+
+  try {
+    const response = await axios.post(
+      "http://localhost:8090/api/password/forgot-password",
+      { email } // or { email: form.email }
+    );
+
+    console.log("Response:", response.data);
+    setSent(true); // show success message
+  } catch (error) {
+    if (error.response) {
+      console.log("Server Error:", error.response.data);
+    } else {
+      console.log("Error:", error.message);
+    }
+  } finally {
     setLoading(false);
-    setSent(true);
-  };
+  }
+};
 
   return (
     <>
