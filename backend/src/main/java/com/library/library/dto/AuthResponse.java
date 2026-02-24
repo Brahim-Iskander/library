@@ -1,0 +1,17 @@
+package com.library.library.dto;
+
+public class AuthResponse {
+    private String token;
+    private String email;
+
+    public AuthResponse(String token, String email) {
+        this.token = token;
+        this.email = email;
+    }
+
+    // getters et setters
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
