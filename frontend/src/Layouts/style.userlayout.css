@@ -1,0 +1,36 @@
+.btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btns:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btns.active {
+  background: transparent;
+}
+
+.btns.active a {
+  color: #72bb12 !important;
+}
+nav .p Link {
+  font-weight: bold;
+  font-size: 20px;
+}
+.btnclose {
+  color: #fff;
+  background: transparent;
+  border: none;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.btnclose:hover {
+  color: #e00606;
+  border-radius: 4px;
+}
