@@ -5,11 +5,14 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import HistoryIcon from "@mui/icons-material/History";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import "./style.userlayout.css";
-
+import { useUser } from "../context/UserContext.jsx";
+import { useNavigate } from "react-router-dom";
 import UserNavbar from "../components/UserNavbar";
 import { useState } from "react";
 function Layout() {
   const [clickedId, setClickedId] = useState(1);
+  const { setUser } = useUser();
+    const navigate = useNavigate();
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
@@ -78,7 +81,11 @@ function Layout() {
         </nav>
         <button
         className="btnclose"
-          
+          onClick={() => {
+            setUser(null);
+             // Clear user data on logout
+            navigate("/login"); // Redirect to login page
+          }}
         >
           Logout
         </button>

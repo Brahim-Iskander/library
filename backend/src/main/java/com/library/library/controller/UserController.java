@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<AuthResponse> loginUser(@RequestBody User loginRequest) {
         User user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         String token = jwtUtil.generateToken(user.getEmail());
-        return ResponseEntity.ok(new AuthResponse(token, user.getEmail()));
+        return ResponseEntity.ok(new AuthResponse(token, user.getEmail(), user.getRole(), user.getFullName()));
     }
 
     @PutMapping("/{id}")

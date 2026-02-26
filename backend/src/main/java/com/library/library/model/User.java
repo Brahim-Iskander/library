@@ -22,7 +22,7 @@ public class User {
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    private Role role=Role.USER;
+    private Role role=Role.STUDENT;
 
     // One user can have many emprunts (borrowed books)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

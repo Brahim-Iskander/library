@@ -17,12 +17,16 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
+import { useUser } from "../../context/UserContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const [token, setToken] = useState(null);
+  const { setUser } = useUser();
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -37,13 +41,10 @@ export default function Login() {
       console.log("API response:", response.data);
 
       // Save the token if login successful
-      setToken(response.data.token);
+        setUser(response.data);
+      navigate("/user/dashbored");
 
-      // Optionally store in localStorage for persistence
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("email", response.data.email);
 
-      alert("Login successful!");
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Login failed");
