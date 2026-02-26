@@ -1,7 +1,7 @@
 package com.library.library.model;
 
-
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,19 +22,25 @@ public class User {
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    private Role role=Role.STUDENT;
+    private Role role = Role.STUDENT;
 
-    // One user can have many emprunts (borrowed books)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Emprunt> emprunts;
 
+    // Track when the user joined
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime memberSince;
+
     // Constructors
-    public User() {}
+    public User() {
+        this.memberSince = LocalDateTime.now(); // default to current time
+    }
 
     public User(String email, String password, String fullName) {
         this.email = email;
         this.password = password;
         this.fullName = fullName;
+        this.memberSince = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -52,7 +58,10 @@ public class User {
 
     public List<Emprunt> getEmprunts() { return emprunts; }
     public void setEmprunts(List<Emprunt> emprunts) { this.emprunts = emprunts; }
+
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
+    public LocalDateTime getMemberSince() { return memberSince; }
+    public void setMemberSince(LocalDateTime memberSince) { this.memberSince = memberSince; }
 }

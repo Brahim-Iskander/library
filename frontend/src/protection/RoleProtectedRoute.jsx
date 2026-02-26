@@ -2,7 +2,11 @@ import { Navigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 function RoleProtectedRoute({ children, allowedRoles }) {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return <div>Loading...</div>; // wait for localStorage restoration
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;

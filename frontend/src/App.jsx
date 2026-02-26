@@ -10,7 +10,7 @@ import RoleProtectedRoute from "./protection/RoleProtectedRoute";
 import MyBrowedBook from "./user/MyBrowedBook/MyBrowedbook";
 import History from "./user/history/history";
 import BrowseBook from "./user/BrowseBook/BrowseBook";
-
+import Profile from "./user/profile/Profile";
 function App() {
   return (
     <Routes>
@@ -28,7 +28,7 @@ function App() {
         <Route path="books" element={<BrowseBook />} />
         <Route path="borrowed" element={<MyBrowedBook />} />
         <Route path="history" element={<History />} />
-        <Route path="profile" element={<h1>Profile</h1>} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );

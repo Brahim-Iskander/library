@@ -23,7 +23,6 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
-  const [token, setToken] = useState(null);
   const { setUser } = useUser();
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -42,6 +41,7 @@ export default function Login() {
 
       // Save the token if login successful
         setUser(response.data);
+        localStorage.setItem("user", JSON.stringify(response.data));
       navigate("/user/dashbored");
 
 

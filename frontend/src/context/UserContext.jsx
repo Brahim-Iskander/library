@@ -1,21 +1,24 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
-// 1. Create Context
 const UserContext = createContext();
 
-// 2. Create Provider
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
-  // user will contain { id, name, email, role, token }
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // NEW
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false); // done loading
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-// 3. Custom Hook (clean usage)
-export const useUser = () => {
-  return useContext(UserContext);
-};
+export const useUser = () => useContext(UserContext);
