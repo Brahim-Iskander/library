@@ -1,27 +1,25 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import {
-  CheckCircleIcon,
-  InformationCircleIcon,
-} from "@heroicons/react/24/outline";
-import { BookOpenIcon } from "@heroicons/react/24/outline";
-import TableUser from "../../components/TableUser";
-import RecommendedBooks from "../../components/RecommendedBooks";
-export default function Dashbored() {
+
+import TableHistoryUser from "../../components/TableHistoryUser";
+
+export default function History() {
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0" }}>
+    <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
       <Grid container spacing={2} sx={{ padding: "20px" }}>
         <Grid size={{ xs: 12 }} sx={{ marginBottom: "20px" }}>
           <Typography variant="h3" component="h2" sx={{ fontWeight: "bold" }}>
-            Dashboard
+            Borrowing History
+
           </Typography>
           <Typography
             variant="body1"
             component="p"
             sx={{ color: "gray", marginTop: "10px" }}
           >
-            Welcome back! Here's your library overview
+View your complete borrowing history
+
           </Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
@@ -39,7 +37,8 @@ export default function Dashbored() {
             >
               <Box>
                 <Typography variant="p" component="h3">
-                  Active Loan{" "}
+                  Total Books Borrowed
+{" "}
                 </Typography>
                 <Typography
                   variant="h4"
@@ -49,16 +48,7 @@ export default function Dashbored() {
                   3
                 </Typography>
               </Box>
-                <BookOpenIcon
-                  style={{
-                    color: "blue",
-                    width: "60px",
-                    height: "60px",
-                    padding: "10px",
-                    backgroundColor: "rgba(0, 0, 255, 0.1)",
-                    borderRadius: "10px",
-                  }}
-                />
+               
             </Box>
             <Box
               sx={{
@@ -73,7 +63,7 @@ export default function Dashbored() {
             >
               <Box>
                 <Typography variant="p" component="h3">
-                  Returned Books
+Books Returned on Time
                 </Typography>
                 <Typography
                   variant="h4"
@@ -83,16 +73,7 @@ export default function Dashbored() {
                   3
                 </Typography>
               </Box>
-                <CheckCircleIcon
-                  style={{
-                    color: "green",
-                    width: "60px",
-                    height: "60px",
-                    padding: "10px",
-                    backgroundColor: "rgba(0, 128, 0, 0.1)",
-                    borderRadius: "10px",
-                  }}
-                />
+                
             </Box>
             <Box
               sx={{
@@ -107,7 +88,7 @@ export default function Dashbored() {
             >
               <Box>
                 <Typography variant="p" component="h3">
-                  Late Books
+Late Returns
                 </Typography>
                 <Typography
                   variant="h4"
@@ -117,28 +98,11 @@ export default function Dashbored() {
                   3
                 </Typography>
               </Box>
-              <InformationCircleIcon
-                style={{
-                  color: "red",
-                  width: "60px",
-                  height: "60px",
-                  padding: "10px",
-                    backgroundColor: "rgba(255, 0, 0, 0.1)",
-                    borderRadius: "10px",
-                }}
-              />
             </Box>
           </Box>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Box>
-            
-            <RecommendedBooks />
-
-          </Box>
-        </Grid>
-        <Grid size={{ xs: 12 }}>
-            <TableUser />
+            <TableHistoryUser />
         </Grid>
       </Grid>
     </Box>

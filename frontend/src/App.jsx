@@ -7,6 +7,9 @@ import ResetPassword from "./user/ResetPassword/ResetPassword";
 import Layout from "./Layouts/UserLayout";
 import Dashbored from "./user/dashbored/dashbored";
 import RoleProtectedRoute from "./protection/RoleProtectedRoute";
+import MyBrowedBook from "./user/MyBrowedBook/MyBrowedbook";
+import History from "./user/history/history";
+import BrowseBook from "./user/BrowseBook/BrowseBook";
 
 function App() {
   return (
@@ -22,9 +25,9 @@ function App() {
         </RoleProtectedRoute>
       }>
         <Route path="dashbored" element={<Dashbored />} />
-        <Route path="list" element={<h1>Browse Books</h1>} />
-        <Route path="borrowed" element={<h1>My Borrowed Books</h1>} />
-        <Route path="history" element={<h1>History</h1>} />
+        <Route path="books" element={<BrowseBook />} />
+        <Route path="borrowed" element={<MyBrowedBook />} />
+        <Route path="history" element={<History />} />
         <Route path="profile" element={<h1>Profile</h1>} />
       </Route>
     </Routes>

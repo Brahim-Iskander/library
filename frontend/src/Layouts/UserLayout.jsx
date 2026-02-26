@@ -52,7 +52,7 @@ function Layout() {
             onClick={() => setClickedId(2)}
           >
             <MenuBookIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/list">Browse Books</Link>
+            <Link to="/user/books">Browse Books</Link>
           </p>
 
           <p
