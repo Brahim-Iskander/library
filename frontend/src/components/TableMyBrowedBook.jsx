@@ -8,55 +8,54 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Chip from "@mui/material/Chip";
 import axios from "axios";
-import { useUser } from "../context/UserContext"; // your context
-
-// Function to calculate status
-
+import { Button } from "@mui/material";
+import { useUser } from "../context/UserContext";
 
 export default function DenseTable() {
-   const { user } = useUser();
+  const { user } = useUser();
   const [rows, setRows] = useState([]);
+  const handleReturn = async (empruntId) => {
+  try {
+    await axios.put(
+      `http://localhost:8090/api/emprunts/${empruntId}/return`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${user.token}` },
+      }
+    );
 
-  useEffect(() => {
-  const fetchEmprunts = async () => {
-    if (!user?.token) {
-      console.log("No token, cannot fetch");
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        "http://localhost:8090/api/emprunts/my",
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
-      console.log("Response data:", response.data); // <--- check this
-      setRows(response.data);
-    } catch (error) {
-      console.error("Error fetching emprunts:", error.response || error);
-    }
-  };
-
-  fetchEmprunts();
-}, [user]);
-
-const getStatus = (emprunt) => {
-  const today = new Date();
-  const borrowDate = new Date(emprunt.borrowDate);
-  const expectedReturnDate = new Date(emprunt.returnDate); // the scheduled return date
-
-  if (expectedReturnDate < today) {
-    // The expected return date has passed → overdue
-    return <Chip label="Overdue" color="error" size="small" />;
-  } else if (borrowDate <= today && today <= expectedReturnDate) {
-    // Borrowed and not yet overdue
-    return <Chip label="Borrowed" color="warning" size="small" />;
-  } else {
-    // Future borrow? (Optional, in case of future scheduling)
-    return <Chip label="Scheduled" color="info" size="small" />;
+    // Update UI instantly (no reload)
+    setRows((prev) =>
+      prev.map((row) =>
+        row.id === empruntId
+          ? { ...row, status: "returned" }
+          : row
+      )
+    );
+  } catch (error) {
+    console.error("Error returning book:", error.response || error);
   }
 };
+
+  useEffect(() => {
+    const fetchEmprunts = async () => {
+      if (!user?.token) return;
+      try {
+        const response = await axios.get("http://localhost:8090/api/emprunts/my", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        setRows(response.data);
+      } catch (error) {
+        console.error("Error fetching emprunts:", error.response || error);
+      }
+    };
+    fetchEmprunts();
+  }, [user]);
+
+  const getDaysDiff = (returnDate) => {
+    return Math.ceil((new Date(returnDate) - new Date()) / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="recent activity table">
@@ -72,51 +71,52 @@ const getStatus = (emprunt) => {
         </TableHead>
 
         <TableBody>
-          {rows.map((row) => {
-            const status = getStatus(row.returnDate, row.actualReturnDate);
-            const daysDiff = Math.ceil((new Date(row.returnDate) - new Date()) / (1000 * 60 * 60 * 24));
+          {[...rows].reverse().map((row) => {
+            const today = new Date();
+            const returnDate = new Date(row.returnDate);
+            const daysDiff = getDaysDiff(row.returnDate);
+
+            // Determine status dynamically
+            let statusLabel = "";
+            let chipColor = "info";
+            let actionText = "";
+
+            if (row.status === "returned") {
+              statusLabel = "Returned";
+              chipColor = "success";
+              actionText = "Returned";
+            } else if (today > returnDate) {
+              // Not returned & today is past return date → Late
+              statusLabel = "Late";
+              chipColor = "error";
+              actionText = "Return Now";
+            } else {
+              // Borrowed and not overdue
+              statusLabel = "Borrowed";
+              chipColor = "warning";
+              actionText = "Return Soon";
+            }
 
             return (
               <TableRow
-                key={row.title + row.borrowDate}
+                key={row.id}
                 sx={{
                   "&:last-child td, &:last-child th": { border: 0 },
                   "&:hover": { backgroundColor: "#f0f0f0" },
                 }}
               >
-                <TableCell component="th" scope="row">{row.book?.title ?? "no title"}</TableCell>
+                <TableCell component="th" scope="row">
+                  {row.book?.title ?? "No title"}
+                </TableCell>
                 <TableCell align="left">{row.borrowDate}</TableCell>
                 <TableCell align="left">{row.returnDate}</TableCell>
-
                 <TableCell align="center">
                   <Chip
-                    label={status}
-                    sx={{
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "100px",
-                      border:
-                        status === "Returned"
-                          ? "1px solid green"
-                          : status === "Late"
-                            ? "1px solid red"
-                            : "1px solid blue",
-                      backgroundColor:
-                        status === "Returned"
-                          ? "rgba(0, 128, 0, 0.1)"
-                          : status === "Late"
-                            ? "rgba(255, 0, 0, 0.1)"
-                            : "rgba(0, 0, 255, 0.1)",
-                      color:
-                        status === "Returned"
-                          ? "green"
-                          : status === "Late"
-                            ? "red"
-                            : "blue",
-                    }}
+                    label={statusLabel}
+                    color={chipColor}
+                    sx={{ fontWeight: "bold", textAlign: "center", width: 100 }}
                   />
                 </TableCell>
-
                 <TableCell align="center">
                   {daysDiff > 0
                     ? `${daysDiff} days remaining`
@@ -124,15 +124,20 @@ const getStatus = (emprunt) => {
                       ? `${Math.abs(daysDiff)} days ago`
                       : "Due Today"}
                 </TableCell>
-
-                <TableCell align="center">
-                  {status === "Late"
-                    ? "Return Now"
-                    : status === "Active"
-                      ? "Return Soon"
-                      : "Returned"}
-                </TableCell>
-              </TableRow>
+<TableCell align="center">
+  {row.status !== "returned" ? (
+    <Button
+      variant="contained"
+      color={today > returnDate ? "error" : "primary"}
+      size="small"
+      onClick={() => handleReturn(row.id)}
+    >
+      Return Book
+    </Button>
+  ) : (
+    <Chip label="Returned" color="success" size="small" />
+  )}
+</TableCell>              </TableRow>
             );
           })}
         </TableBody>

@@ -8,7 +8,22 @@ import {
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import TableUser from "../../components/TableUser";
 import RecommendedBooks from "../../components/RecommendedBooks";
+import { useState } from "react";
 export default function Dashbored() {
+  const [emprunts, setEmprunts] = useState([]);
+  const activeLoans = emprunts.filter(
+  (e) => e.status === "borrowed"
+).length;
+
+const returnedBooks = emprunts.filter(
+  (e) => e.status === "returned"
+).length;
+
+const lateBooks = emprunts.filter(
+  (e) =>
+    e.status === "borrowed" &&
+    new Date(e.returnDate) < new Date()
+).length;
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0" }}>
       <Grid container spacing={2} sx={{ padding: "20px" }}>
@@ -46,7 +61,7 @@ export default function Dashbored() {
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {activeLoans}
                 </Typography>
               </Box>
                 <BookOpenIcon
@@ -80,7 +95,7 @@ export default function Dashbored() {
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {returnedBooks}
                 </Typography>
               </Box>
                 <CheckCircleIcon
@@ -114,7 +129,7 @@ export default function Dashbored() {
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {lateBooks}
                 </Typography>
               </Box>
               <InformationCircleIcon
@@ -138,7 +153,7 @@ export default function Dashbored() {
           </Box>
         </Grid>
         <Grid size={{ xs: 12 }}>
-            <TableUser />
+            <TableUser onDataLoaded={setEmprunts} />
         </Grid>
       </Grid>
     </Box>

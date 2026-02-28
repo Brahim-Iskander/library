@@ -10,51 +10,43 @@ import Paper from "@mui/material/Paper";
 import { Box, Chip } from "@mui/material";
 import { useUser } from "../context/UserContext";
 
-export default function DenseTable() {
+export default function DenseTable({ onDataLoaded }) {
   const { user } = useUser();
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-  const fetchEmprunts = async () => {
-    if (!user?.token) {
-      console.log("No token, cannot fetch");
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        "http://localhost:8090/api/emprunts/my",
-        {
+    const fetchEmprunts = async () => {
+      if (!user?.token) return;
+      try {
+        const response = await axios.get("http://localhost:8090/api/emprunts/my", {
           headers: { Authorization: `Bearer ${user.token}` },
+        });
+        setRows(response.data);
+        if (onDataLoaded) {
+          onDataLoaded(response.data);
         }
-      );
-      console.log("Response data:", response.data); // <--- check this
-      setRows(response.data);
-    } catch (error) {
-      console.error("Error fetching emprunts:", error.response || error);
+      } catch (error) {
+        console.error("Error fetching emprunts:", error.response || error);
+      }
+    };
+    fetchEmprunts();
+  }, [user]);
+
+  const getChipProps = (row) => {
+    const today = new Date();
+    const returnDate = new Date(row.returnDate);
+
+    if (row.status === "returned") {
+      return { label: "Returned", color: "success" };
     }
+    // If not returned and overdue
+    if (today > returnDate) {
+      return { label: "Overdue", color: "error" };
+    }
+    // Otherwise, still borrowed
+    return { label: "Borrowed", color: "warning" };
   };
 
-  fetchEmprunts();
-}, [user]);
-
-const getStatus = (emprunt) => {
-  const today = new Date();
-  const borrowDate = new Date(emprunt.borrowDate);
-  const expectedReturnDate = new Date(emprunt.returnDate); // the scheduled return date
-
-  if (expectedReturnDate < today) {
-    // The expected return date has passed → overdue
-    return <Chip label="Overdue" color="error" size="small" />;
-  } else if (borrowDate <= today && today <= expectedReturnDate) {
-    // Borrowed and not yet overdue
-    return <Chip label="Borrowed" color="warning" size="small" />;
-  } else {
-    // Future borrow? (Optional, in case of future scheduling)
-    return <Chip label="Scheduled" color="info" size="small" />;
-  }
-};
-  console.log(rows);
   return (
     <Box sx={{ p: 2, backgroundColor: "#fff", borderRadius: 2, boxShadow: 3 }}>
       <TableContainer component={Paper}>
@@ -65,23 +57,34 @@ const getStatus = (emprunt) => {
               <TableCell sx={{ fontWeight: "bold" }}>Author</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Borrow Date</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Return Date</TableCell>
-              <TableCell  sx={{ fontWeight: "bold" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-  {rows.map((row) => {
-    console.log("Rendering row:", row);
-    return (
-      <TableRow key={row.id}>
-        <TableCell>{row.book?.title ?? "no title"}</TableCell>
-        <TableCell>{row.book?.author ?? "no author"}</TableCell>
-        <TableCell>{row.borrowDate ?? "-"}</TableCell>
-        <TableCell>{row.returnDate ?? "-"}</TableCell>
-        <TableCell>{getStatus(row)}</TableCell>
-      </TableRow>
-    );
-  })}
-</TableBody>
+            {[...rows].reverse().map((row) => {
+              const chipProps = getChipProps(row);
+
+              return (
+                <TableRow
+                  key={row.id}
+                  sx={{
+                    "&:hover": { backgroundColor: "#f0f0f0" },
+                    backgroundColor:
+                      chipProps.color === "error" ? "rgba(255,0,0,0.05)" : "inherit",
+                  }}
+                >
+                  <TableCell>{row.book?.title ?? "No title"}</TableCell>
+                  <TableCell>{row.book?.author ?? "No author"}</TableCell>
+                  <TableCell>{row.borrowDate ? new Date(row.borrowDate).toLocaleDateString() : "-"}</TableCell>
+                  <TableCell>{row.returnDate ? new Date(row.returnDate).toLocaleDateString() : "-"}</TableCell>
+                  <TableCell>
+                    <Chip {...chipProps} size="small" sx={{ fontWeight: "bold", width: 100 }} />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
         </Table>
       </TableContainer>
     </Box>

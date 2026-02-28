@@ -7,9 +7,31 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { Avatar, Divider } from "@mui/material";
 import { useUser } from "../../context/UserContext";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
 export default function Profile() {
-  const { user } = useUser();
+    const { user } = useUser();
+
+  useEffect(() => {
+  const fetchEmprunts = async () => {
+    try {
+      const res = await axios.get("http://localhost:8090/api/emprunts/my", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setEmprunts(res.data);
+    } catch (error) {
+      console.error("Error fetching emprunts", error);
+    }
+  };
+
+  fetchEmprunts();
+}, []);
+  const [emprunts, setEmprunts] = useState([]);
+  const totalBorrowed = emprunts.length;
+
+const activeLoans = emprunts.filter(
+  (e) => e.status === "borrowed"
+).length;
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
       {/* Header */}
@@ -81,7 +103,7 @@ export default function Profile() {
               Total Borrowed
             </Typography>
             <Typography variant="body1" fontWeight={700}>
-              {user ? user.booksBorrowed : 0}
+              {totalBorrowed}
             </Typography>
           </Box>
           <Divider sx={{ borderColor: "rgba(255,255,255,0.3)" }} />
@@ -96,7 +118,7 @@ export default function Profile() {
               Active Loans
             </Typography>
             <Typography variant="body1" fontWeight={700}>
-              3
+              {activeLoans}
             </Typography>
           </Box>
         </Box>
@@ -142,7 +164,7 @@ export default function Profile() {
             {
               icon: <MenuBookIcon />,
               label: "Books Borrowed",
-              value: user ? user.booksBorrowed : "",
+              value: totalBorrowed,
             },
           ].map(({ icon, label, value }) => (
             <Grid item xs={12} sm={6} key={label}>

@@ -1,10 +1,23 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-
+import { useState } from "react";
 import TableHistoryUser from "../../components/TableHistoryUser";
 
 export default function History() {
+  const [emprunts, setEmprunts] = useState([]);
+  const totalBorrowed = emprunts.length;
+
+const ActiveLoan = emprunts.filter(
+  (e) =>
+    e.status === "borrowed" 
+).length;
+
+const lateReturns = emprunts.filter(
+  (e) =>
+    e.status === "borrowed" &&
+    new Date() > new Date(e.returnDate)
+).length;
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
       <Grid container spacing={2} sx={{ padding: "20px" }}>
@@ -45,7 +58,7 @@ View your complete borrowing history
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {totalBorrowed}
                 </Typography>
               </Box>
                
@@ -63,14 +76,14 @@ View your complete borrowing history
             >
               <Box>
                 <Typography variant="p" component="h3">
-Books Returned on Time
+Active Loans
                 </Typography>
                 <Typography
                   variant="h4"
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {ActiveLoan}
                 </Typography>
               </Box>
                 
@@ -95,14 +108,14 @@ Late Returns
                   component="p"
                   sx={{ fontWeight: "bold" }}
                 >
-                  3
+                  {lateReturns}
                 </Typography>
               </Box>
             </Box>
           </Box>
         </Grid>
         <Grid size={{ xs: 12 }}>
-            <TableHistoryUser />
+            <TableHistoryUser onDataLoaded={setEmprunts} />
         </Grid>
       </Grid>
     </Box>

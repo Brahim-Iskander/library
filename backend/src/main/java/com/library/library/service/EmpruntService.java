@@ -93,4 +93,13 @@ public class EmpruntService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Emprunt not found"));
         empruntRepository.delete(emprunt);
     }
+     public void updateBookStatus(Long id) {
+        Emprunt emprunt = empruntRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Emprunt not found"));
+
+        emprunt.setStatus("returned");
+        emprunt.setReturnDate(LocalDate.now());
+
+        empruntRepository.save(emprunt);
+    }
 }

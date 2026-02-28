@@ -65,4 +65,9 @@ public ResponseEntity<List<Emprunt>> getMyEmprunts(
         empruntService.deleteEmprunt(id);
         return ResponseEntity.noContent().build();
     }
+     @PutMapping("/{id}/return")
+    public ResponseEntity<?> updateBookStatus(@PathVariable Long id) {
+        empruntService.updateBookStatus(id);
+        return ResponseEntity.ok("Book returned successfully");
+    }
 }

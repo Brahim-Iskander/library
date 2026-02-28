@@ -27,15 +27,18 @@ public class Emprunt {
 
     @Column
     private LocalDate returnDate;
+    @Column(nullable = false)
+    private String status = "borrowed";
 
     // Constructors
     public Emprunt() {}
 
-    public Emprunt(User user, Book book, LocalDate borrowDate, LocalDate returnDate) {
+    public Emprunt(User user, Book book, LocalDate borrowDate, LocalDate returnDate, String status) {
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
         this.returnDate = returnDate;
+        this.status = status;
     }
 
     // Getters & Setters
@@ -53,4 +56,7 @@ public class Emprunt {
 
     public LocalDate getReturnDate() { return returnDate; }
     public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

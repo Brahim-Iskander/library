@@ -12,7 +12,7 @@ import Chip from "@mui/material/Chip";
 import axios from "axios";
 import { useUser } from "../context/UserContext";
 
-export default function DenseTable() {
+export default function DenseTable({ onDataLoaded }) {
   const { user } = useUser();
   const [rows, setRows] = useState([]);
 
@@ -32,8 +32,12 @@ export default function DenseTable() {
           author: emprunt.book.author,
           borrowDate: emprunt.borrowDate,
           returnDate: emprunt.returnDate,
+          status: emprunt.status,
         }));
         setRows(tableData);
+        if (onDataLoaded) {
+          onDataLoaded(response.data);
+        }
       } catch (error) {
         console.error("Error fetching emprunts:", error.response || error);
       }
@@ -42,19 +46,7 @@ export default function DenseTable() {
     fetchEmprunts();
   }, [user]);
 
-  const getStatus = (emprunt) => {
-    const today = new Date();
-    const borrowDate = new Date(emprunt.borrowDate);
-    const expectedReturnDate = new Date(emprunt.returnDate);
-
-    if (expectedReturnDate < today) {
-      return <Chip label="Overdue" color="error" size="small" />;
-    } else if (borrowDate <= today && today <= expectedReturnDate) {
-      return <Chip label="Borrowed" color="warning" size="small" />;
-    } else {
-      return <Chip label="Scheduled" color="info" size="small" />;
-    }
-  };
+  
 
   return (
     <Box sx={{ p: 2, backgroundColor: "#ffffff", borderRadius: 2, boxShadow: 3 }}>
@@ -74,7 +66,7 @@ export default function DenseTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(0, 4).map((row) => (
+            {rows.slice(-4).map((row) => (
               <TableRow
                 key={row.title + row.borrowDate}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 }, "&:hover": { backgroundColor: "#f0f0f0" } }}
@@ -83,7 +75,7 @@ export default function DenseTable() {
                 <TableCell align="left">{row.author}</TableCell>
                 <TableCell align="left">{row.borrowDate}</TableCell>
                 <TableCell align="left">{row.returnDate}</TableCell>
-                <TableCell align="center">{getStatus(row)}</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold", color: row.status === "borrowed" ? "orange" : row.status === "returned" ? "green" : "blue" }}>{row.status === "borrowed" ? "Borrowed" : row.status === "returned" ? "Returned" : "Scheduled"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
