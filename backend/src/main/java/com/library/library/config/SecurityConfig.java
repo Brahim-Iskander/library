@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-  @Bean
+ @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
@@ -21,7 +21,10 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .requestMatchers(
                 "/api/users/**",
                 "/api/password/forgot-password",
-                "/api/password/reset-password"
+                "/api/password/reset-password",
+                "/api/emprunts/**",
+                "/api/books/**"   // allow public access to books
+ // ✅ ADD THIS
             ).permitAll()
             .anyRequest().authenticated()
         );

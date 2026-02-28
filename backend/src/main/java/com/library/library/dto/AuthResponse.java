@@ -9,13 +9,15 @@ public class AuthResponse {
     private Role role;
     private String fullname;
     private LocalDateTime memberSince; // new field
+    private int booksBorrowed; // new field
 
-    public AuthResponse(String token, String email, Role role, String fullname, LocalDateTime memberSince) {
+    public AuthResponse(String token, String email, Role role, String fullname, LocalDateTime memberSince, int booksBorrowed) {
         this.token = token;
         this.email = email;
         this.role = role;
         this.fullname = fullname;
         this.memberSince = memberSince; // initialize
+        this.booksBorrowed = booksBorrowed; // initialize
     }
 
     // getters and setters
@@ -33,4 +35,7 @@ public class AuthResponse {
 
     public LocalDateTime getMemberSince() { return memberSince; }
     public void setMemberSince(LocalDateTime memberSince) { this.memberSince = memberSince; }
+
+    public int getBooksBorrowed() { return booksBorrowed; }
+    public void setBooksBorrowed(int booksBorrowed) { this.booksBorrowed = booksBorrowed; }
 }

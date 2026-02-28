@@ -81,7 +81,7 @@ export default function Profile() {
               Total Borrowed
             </Typography>
             <Typography variant="body1" fontWeight={700}>
-              5
+              {user ? user.booksBorrowed : 0}
             </Typography>
           </Box>
           <Divider sx={{ borderColor: "rgba(255,255,255,0.3)" }} />

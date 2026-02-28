@@ -1,5 +1,6 @@
 package com.library.library.controller;
 
+import com.library.library.dto.BookDTO;
 import com.library.library.model.Book;
 import com.library.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,13 @@ public class BookController {
 
     // Get all books
     @GetMapping
-    public List<Book> getAllBooks() {
+    public List<BookDTO> getAllBooks() {
         return bookService.getAllBooks();
     }
 
     // Get book by id
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable Long id) {
+    public BookDTO getBookById(@PathVariable Long id) {
         return bookService.getBookById(id);
     }
 

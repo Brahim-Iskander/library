@@ -3,6 +3,8 @@ package com.library.library.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "books")
 public class Book {
@@ -31,15 +33,21 @@ public class Book {
 
     @Column(nullable = false)
     private int available; // copies currently available
+    @Column
+    private String description; // NEW: book description
+
+    @Column
+    private String publicationDate; // NEW: publication date or year
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Emprunt> emprunts;
 
     // Constructors
     public Book() {}
 
     public Book(String title, String author, String category, String isbn,
-                String imageUrl, int quantity, int available) {
+                String imageUrl, int quantity, int available, String description, String publicationDate) {
         this.title = title;
         this.author = author;
         this.category = category;
@@ -47,8 +55,16 @@ public class Book {
         this.imageUrl = imageUrl;
         this.quantity = quantity;
         this.available = available;
+        this.description = description;
+        this.publicationDate = publicationDate;
     }
 
+    // Getters & Setters for new fields
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getPublicationDate() { return publicationDate; }
+    public void setPublicationDate(String publicationDate) { this.publicationDate = publicationDate; }
     // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

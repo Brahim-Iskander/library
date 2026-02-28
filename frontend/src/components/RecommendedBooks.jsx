@@ -43,8 +43,7 @@ const books = [
     id: 3,
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
+    description: "A novel about the se and racial inequality.",
     category: "Classic",
     date: "1960",
     image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
@@ -54,8 +53,7 @@ const books = [
     id: 4,
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
+    description: "A novel about racial inequality.",
     category: "Classic",
     date: "1960",
     image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",

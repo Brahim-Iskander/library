@@ -1,5 +1,5 @@
 package com.library.library.model;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -12,10 +12,13 @@ public class Emprunt {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "user_id")
+    
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "book_id")
     private Book book;
 
@@ -28,10 +31,11 @@ public class Emprunt {
     // Constructors
     public Emprunt() {}
 
-    public Emprunt(User user, Book book, LocalDate borrowDate) {
+    public Emprunt(User user, Book book, LocalDate borrowDate, LocalDate returnDate) {
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
+        this.returnDate = returnDate;
     }
 
     // Getters & Setters

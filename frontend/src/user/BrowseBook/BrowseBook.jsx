@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import AllBooks from "../../components/AllBooks";
 export default function BrowseBook() {
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0" }}>
+    <Box sx={{ flexGrow: 1, backgroundColor: "#f0f0f0" , minHeight: "100vh", paddingTop: "40px" }}>
       <Grid container spacing={2} sx={{ padding: "20px" }}>
         <Grid size={{ xs: 12 }} sx={{ marginBottom: "20px" }}>
           <Typography variant="h3" component="h2" sx={{ fontWeight: "bold" }}>

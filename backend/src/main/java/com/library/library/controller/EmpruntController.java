@@ -5,15 +5,19 @@ import com.library.library.service.EmpruntService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.library.library.util.JwtUtil;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/emprunts")
+@CrossOrigin(origins = "*") // allow frontend requests
 public class EmpruntController {
 
     @Autowired
     private EmpruntService empruntService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // Get all emprunts
     @GetMapping
@@ -21,28 +25,44 @@ public class EmpruntController {
         return empruntService.getAllEmprunts();
     }
 
-    // Get emprunt by id
+    // Get emprunt by ID
     @GetMapping("/{id}")
-    public Emprunt getEmpruntById(@PathVariable Long id) {
-        return empruntService.getEmpruntById(id);
+    public ResponseEntity<Emprunt> getEmpruntById(@PathVariable Long id) {
+        return ResponseEntity.ok(empruntService.getEmpruntById(id));
     }
+    @GetMapping("/my")
+public ResponseEntity<List<Emprunt>> getMyEmprunts(
+        @RequestHeader("Authorization") String authHeader
+) {
+    String token = authHeader.replace("Bearer ", "");
+    String email = jwtUtil.extractSubject(token);
+
+    return ResponseEntity.ok(
+        empruntService.getEmpruntsByUserEmail(email)
+    );
+}
 
     // Borrow a book
     @PostMapping("/borrow")
-    public Emprunt borrowBook(@RequestParam Long userId, @RequestParam Long bookId) {
-        return empruntService.borrowBook(userId, bookId);
+    public ResponseEntity<Emprunt> borrowBook(
+            @RequestParam String email,
+            @RequestParam Long bookId
+    ) {
+        Emprunt emprunt = empruntService.borrowBook(email, bookId);
+        return ResponseEntity.ok(emprunt);
     }
 
     // Return a book
-    @PutMapping("/return/{id}")
-    public Emprunt returnBook(@PathVariable Long id) {
-        return empruntService.returnBook(id);
+    @PostMapping("/return")
+    public ResponseEntity<Emprunt> returnBook(@RequestParam Long empruntId) {
+        Emprunt emprunt = empruntService.returnBook(empruntId);
+        return ResponseEntity.ok(emprunt);
     }
 
     // Delete an emprunt
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmprunt(@PathVariable Long id) {
         empruntService.deleteEmprunt(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

@@ -9,6 +9,7 @@ import { useUser } from "../context/UserContext.jsx";
 import { useNavigate } from "react-router-dom";
 import UserNavbar from "../components/UserNavbar";
 import { useState } from "react";
+import { Box } from "@mui/material";
 function Layout() {
   const [clickedId, setClickedId] = useState(1);
   const { setUser } = useUser();
@@ -27,8 +28,13 @@ function Layout() {
           height: "100vh",
         }}
       >
-        <h2>FSM Library</h2>
+        <h2 style={{textAlign: "center", margin: "20px 0"}}>FSM Library</h2>
+        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "20px", justifyContent: "space-around" }} >
+          <img src="/logofsm.png" alt="User Avatar" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
+          <img src="/university.png" alt="University Logo" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
+        </Box>
 
+        
         <nav
           style={{
             marginTop: "30px",

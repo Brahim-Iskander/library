@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -14,79 +14,70 @@ import {
 } from "@mui/material";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-
-const books = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    description:
-      "A portrait of the Jazz Age in all of its decadence and excess.",
-    category: "Classic",
-    date: "1925",
-    image: "https://images.pexels.com/photos/1907784/pexels-photo-1907784.jpeg",
-    available: true,
-  },
-  {
-    id: 2,
-    title: "1984",
-    author: "George Orwell",
-    description:
-      "A dystopian novel set in a totalitarian society under constant surveillance.",
-    category: "Dystopian",
-    date: "1949",
-    image:
-      "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg",
-    available: false,
-  },
-  {
-    id: 3,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-  {
-    id: 4,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-  {
-    id: 5,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-];
+import { useUser } from "../context/UserContext";
+import axios from "axios";
 
 export default function RecommendedBooks() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+  const [books, setBooks] = useState([]);
+  const { user } = useUser();
+
+  useEffect(() => {
+    // Fetch books from API
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get("http://localhost:8090/api/books");
+        console.log("Books fetched:", response.data);
+        // Ensure we always get an array
+        setBooks(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    };
+
+    fetchBooks();
+  }, []);
 
   const categories = ["All", ...new Set(books.map((b) => b.category))];
 
-  const filteredBooks = books.filter((book) => {
-    const matchSearch = book.title.toLowerCase().includes(search.toLowerCase());
+  const filteredBooks = Array.isArray(books)
+    ? books.filter((book) => {
+        const matchSearch = book.title
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        const matchCategory = category === "All" || book.category === category;
+        return matchSearch && matchCategory;
+      })
+    : [];
 
-    const matchCategory = category === "All" || book.category === category;
+  const borrowBook = async (bookId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8090/api/emprunts/borrow",
+        null,
+        {
+          params: {
+            email: user.email,
+            bookId: bookId,
+          },
+        }
+      );
 
-    return matchSearch && matchCategory;
-  });
+      console.log("Borrow success:", response.data);
+      alert("Book borrowed successfully!");
+
+      // Update UI
+      setBooks((prev) =>
+        prev.map((b) =>
+          b.id === bookId ? { ...b, available: b.available - 1 } : b
+        )
+      );
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert("Error borrowing book");
+    }
+  };
 
   return (
     <Box sx={{ p: 4, backgroundColor: "#f5f5f5" }}>
@@ -127,101 +118,108 @@ export default function RecommendedBooks() {
 
       {/* 📚 BOOKS GRID */}
       <Grid container spacing={3}>
-        {filteredBooks.map((book) => (
-          <Grid item xs={12} sm={6} md={4} key={book.id}>
-            <Card
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                borderRadius: "12px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                maxWidth: "340px",
-                margin: "0 auto",
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="220"
-                image={book.image}
-                alt={book.title}
-              />
+        {Array.isArray(filteredBooks) && filteredBooks.length > 0 ? (
+          filteredBooks.map((book) => (
+            <Grid item xs={12} sm={6} md={4} key={book.id}>
+              <Card
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                  maxWidth: "340px",
+                  margin: "0 auto",
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  height="220"
+                  image={book.imageUrl || ""}
+                  alt={book.title}
+                />
 
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    {book.title}
-                  </Typography>
-
-                  <Chip
-                    label={book.available ? "Available" : "Not Available"}
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box
                     sx={{
-                      backgroundColor: book.available ? "#00c950" : "#ff3b3b",
-                      color: "white",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 1,
                     }}
-                  />
-                </Box>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 1 }}
-                >
-                  {book.author}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 1 }}
-                >
-                  {book.description}
-                </Typography>
-
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <AutoStoriesOutlinedIcon
-                    fontSize="inherit"
-                    sx={{ fontSize: 16, color: "gray" }}
-                  />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ ml: 0.5 }}
                   >
-                    {book.category}
+                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                      {book.title}
+                    </Typography>
+
+                    <Chip
+                      label={book.available > 0 ? "Available" : "Not Available"}
+                      sx={{
+                        backgroundColor: book.available > 0 ? "#00c950" : "#ff3b3b",
+                        color: "white",
+                      }}
+                    />
+                  </Box>
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    {book.author}
                   </Typography>
 
-                  <CalendarTodayIcon
-                    fontSize="inherit"
-                    sx={{ fontSize: 16, color: "gray", ml: 1 }}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {book.date}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    {book.description || "No description available"}
                   </Typography>
-                </Stack>
 
-                <Button
-                  variant="contained"
-                  sx={{
-                    mt: 2,
-                    width: "100%",
-                    borderRadius: "8px",
-                  }}
-                  disabled={!book.available}
-                >
-                  Borrow
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <AutoStoriesOutlinedIcon
+                      fontSize="inherit"
+                      sx={{ fontSize: 16, color: "gray" }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ ml: 0.5 }}
+                    >
+                      {book.category}
+                    </Typography>
+
+                    <CalendarTodayIcon
+                      fontSize="inherit"
+                      sx={{ fontSize: 16, color: "gray", ml: 1 }}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {book.publicationDate || "N/A"}
+                    </Typography>
+                  </Stack>
+
+                  <Button
+                    variant="contained"
+                    sx={{
+                      mt: 2,
+                      width: "100%",
+                      borderRadius: "8px",
+                    }}
+                    onClick={() => borrowBook(book.id)}
+                    disabled={book.available === 0}
+                  >
+                    Borrow
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="body1" sx={{ m: 2 }}>
+            No books found.
+          </Typography>
+        )}
       </Grid>
     </Box>
   );
