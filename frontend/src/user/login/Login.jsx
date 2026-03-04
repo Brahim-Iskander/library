@@ -42,7 +42,13 @@ export default function Login() {
       // Save the token if login successful
         setUser(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
-      navigate("/user/dashbored");
+        if (response.data.role === "ADMIN") {
+          navigate("/admin/dashbored");
+        } else if (response.data.role === "LIBRARIAN") {
+          navigate("/librarian/dashbored");
+        } else if (response.data.role === "STUDENT") {
+          navigate("/user/dashbored");
+        }
 
 
     } catch (err) {

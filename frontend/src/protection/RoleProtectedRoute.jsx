@@ -3,6 +3,9 @@ import { useUser } from "../context/UserContext";
 
 function RoleProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useUser();
+  console.log("User object:", user);
+console.log("User role:", user?.role);
+console.log("Allowed roles:", allowedRoles);
 
   if (loading) {
     return <div>Loading...</div>; // wait for localStorage restoration

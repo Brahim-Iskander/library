@@ -177,7 +177,7 @@ export default function PrimarySearchAppBar() {
                 }}
               >
                 <p style={{ fontWeight: "bold" }}> {user?.fullname}</p>
-                <p>{user?.role === "STUDENT" ? "Student" : "Admin"}</p>
+                <p>{user?.role === "STUDENT" ? "Student" : user?.role === "LIBRARIAN" ? "Librarian" : "Admin"}</p>
               </Box>
 
               <Avatar

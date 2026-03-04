@@ -1,9 +1,8 @@
 import { Outlet, Link } from "react-router-dom";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
 import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import HistoryIcon from "@mui/icons-material/History";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+
 import "./style.userlayout.css";
 import { useUser } from "../context/UserContext.jsx";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,7 @@ import { Box } from "@mui/material";
 function Layout() {
   const [clickedId, setClickedId] = useState(1);
   const { setUser } = useUser();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
@@ -28,13 +27,38 @@ function Layout() {
           height: "100vh",
         }}
       >
-        <h2 style={{textAlign: "center", margin: "20px 0"}}>FSM Library</h2>
-        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "20px", justifyContent: "space-around" }} >
-          <img src="/logofsm.png" alt="User Avatar" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
-          <img src="/university.png" alt="University Logo" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
+        <h2 style={{ textAlign: "center", margin: "20px 0" }}>FSM Library</h2>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: "20px",
+            justifyContent: "space-around",
+          }}
+        >
+          <img
+            src="/logofsm.png"
+            alt="User Avatar"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              marginBottom: "10px",
+            }}
+          />
+          <img
+            src="/university.png"
+            alt="University Logo"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              marginBottom: "10px",
+            }}
+          />
         </Box>
 
-        
         <nav
           style={{
             marginTop: "30px",
@@ -50,43 +74,26 @@ function Layout() {
             onClick={() => setClickedId(1)}
           >
             <DashboardCustomizeIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/dashbored">Dashboard</Link>
+            <Link to="/librarian/dashbored">Dashboard</Link>
           </p>
-
           <p
             className={`btns ${clickedId === 2 ? "active" : ""}`}
             onClick={() => setClickedId(2)}
           >
-            <MenuBookIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/books">Browse Books</Link>
+            <LibraryBooksIcon style={{ marginRight: "8px" }} />
+            <Link to="/librarian/manage-books">Manage Books</Link>
           </p>
 
           <p
             className={`btns ${clickedId === 3 ? "active" : ""}`}
             onClick={() => setClickedId(3)}
           >
-            <LibraryBooksIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/borrowed">My Borrowed Books</Link>
-          </p>
-
-          <p
-            className={`btns ${clickedId === 4 ? "active" : ""}`}
-            onClick={() => setClickedId(4)}
-          >
-            <HistoryIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/history">History</Link>
-          </p>
-
-          <p
-            className={`btns ${clickedId === 5 ? "active" : ""}`}
-            onClick={() => setClickedId(5)}
-          >
             <PersonOutlineIcon style={{ marginRight: "8px" }} />
-            <Link to="/user/profile">Profile</Link>
+            <Link to="/librarian/profile">Profile</Link>
           </p>
         </nav>
         <button
-        className="btnclose"
+          className="btnclose"
           onClick={() => {
             setUser(null);
             localStorage.clear();
