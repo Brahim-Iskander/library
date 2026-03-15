@@ -7,7 +7,25 @@
 .btns:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+.btncontact {
+  width: 100%;
+  margin-top: 40px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#22c55e,#16a34a);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
 
+}
+
+.btncontact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
 .btns.active {
   background: transparent;
 }

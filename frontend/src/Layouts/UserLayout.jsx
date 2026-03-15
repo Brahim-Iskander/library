@@ -13,7 +13,17 @@ import { Box } from "@mui/material";
 function Layout() {
   const [clickedId, setClickedId] = useState(1);
   const { setUser } = useUser();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const contactAdmin = () => {
+  const email = "admin@fsmlibrary.com";
+  const subject = "Library Support Request";
+  const body = "Hello Administrator, I need help regarding...";
+
+  const gmailUrl =
+    `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  window.open(gmailUrl, "_blank");
+};
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
@@ -28,13 +38,38 @@ function Layout() {
           height: "100vh",
         }}
       >
-        <h2 style={{textAlign: "center", margin: "20px 0"}}>FSM Library</h2>
-        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "20px", justifyContent: "space-around" }} >
-          <img src="/logofsm.png" alt="User Avatar" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
-          <img src="/university.png" alt="University Logo" style={{ width: "80px", height: "80px", borderRadius: "50%", marginBottom: "10px" }} />
+        <h2 style={{ textAlign: "center", margin: "20px 0" }}>FSM Library</h2>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: "20px",
+            justifyContent: "space-around",
+          }}
+        >
+          <img
+            src="/logofsm.png"
+            alt="User Avatar"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              marginBottom: "10px",
+            }}
+          />
+          <img
+            src="/university.png"
+            alt="University Logo"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              marginBottom: "10px",
+            }}
+          />
         </Box>
 
-        
         <nav
           style={{
             marginTop: "30px",
@@ -85,8 +120,11 @@ function Layout() {
             <Link to="/user/profile">Profile</Link>
           </p>
         </nav>
+        <button className="btncontact" onClick={contactAdmin}>
+          Contact Administrator
+        </button>
         <button
-        className="btnclose"
+          className="btnclose"
           onClick={() => {
             setUser(null);
             localStorage.clear();

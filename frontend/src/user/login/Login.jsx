@@ -40,17 +40,15 @@ export default function Login() {
       console.log("API response:", response.data);
 
       // Save the token if login successful
-        setUser(response.data);
-        localStorage.setItem("user", JSON.stringify(response.data));
-        if (response.data.role === "ADMIN") {
-          navigate("/admin/dashbored");
-        } else if (response.data.role === "LIBRARIAN") {
-          navigate("/librarian/dashbored");
-        } else if (response.data.role === "STUDENT") {
-          navigate("/user/dashbored");
-        }
-
-
+      setUser(response.data);
+      localStorage.setItem("user", JSON.stringify(response.data));
+      if (response.data.role === "ADMIN") {
+        navigate("/admin/dashbored");
+      } else if (response.data.role === "LIBRARIAN") {
+        navigate("/librarian/dashbored");
+      } else if (response.data.role === "STUDENT") {
+        navigate("/user/dashbored");
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Login failed");
@@ -66,6 +64,7 @@ export default function Login() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            background: "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)",
           }}
         >
           {/* ── LEFT SIDE — Image Background ── */}
@@ -76,7 +75,8 @@ export default function Login() {
             sx={{
               backgroundSize: "cover",
               backgroundPosition: "center",
-              display: { xs: "none", md: "block" }, // hidden on mobile
+              display: { xs: "none", md: "block" },
+              // hidden on mobile
             }}
           />
 
@@ -91,6 +91,7 @@ export default function Login() {
               justifyContent: "center",
               bgcolor: "#fff",
               px: { xs: 3, sm: 6, md: 8 },
+              backgroundColor: "transparent",
             }}
           >
             <Box sx={{ width: "100%", maxWidth: 400 }}>

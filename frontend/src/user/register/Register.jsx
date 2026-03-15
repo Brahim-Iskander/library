@@ -175,6 +175,8 @@ export default function Register() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+                        background: "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)",
+
             bgcolor: "#fff",
             overflowY: "auto",
             px: { xs: 3, sm: 6, md: 8 },
@@ -224,7 +226,7 @@ export default function Register() {
                 fullWidth
                 required
                 autoComplete="name"
-                placeholder="Jeffrie Epstein"
+                placeholder="Joe Smith"
                 value={form.fullName}
                 onChange={handleChange("fullName")}
                 error={Boolean(errors.fullName)}

@@ -41,7 +41,7 @@ public class AdminController {
     @GetMapping("/stats")
 public Map<String, Long> getStats() {
     Map<String, Long> stats = new HashMap<>();
-    stats.put("students", userRepository.count());
+    stats.put("students", userRepository.countByRole(Role.STUDENT));
     stats.put("books", bookRepository.count());
     stats.put("emprunts", empruntRepository.count());
     return stats;

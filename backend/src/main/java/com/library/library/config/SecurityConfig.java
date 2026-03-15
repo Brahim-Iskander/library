@@ -24,6 +24,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 "/api/password/reset-password",
                 "/api/emprunts/**",
                 "/api/librarian/books/**",
+                "/api/books/**",
                 "/api/admin/**" // allow public access to admin stats
  // ✅ ADD THIS
             ).permitAll()
