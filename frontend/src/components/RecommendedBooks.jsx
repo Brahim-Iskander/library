@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,71 +9,116 @@ import {
   Button,
   Chip,
   Stack,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-
-const books = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    description:
-      "A portrait of the Jazz Age in all of its decadence and excess.",
-    category: "Classic",
-    date: "1925",
-    image: "https://images.pexels.com/photos/1907784/pexels-photo-1907784.jpeg",
-    available: true,
-  },
-  {
-    id: 2,
-    title: "1984",
-    author: "George Orwell",
-    description:
-      "A dystopian novel set in a totalitarian society under constant surveillance.",
-    category: "Dystopian",
-    date: "1949",
-    image:
-      "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg",
-    available: false,
-  },
-  {
-    id: 3,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description: "A novel about the se and racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-  {
-    id: 4,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description: "A novel about racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-
-  {
-    id: 5,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    description:
-      "A novel about the serious issues of rape and racial inequality.",
-    category: "Classic",
-    date: "1960",
-    image: "https://images.pexels.com/photos/3747505/pexels-photo-3747505.jpeg",
-    available: true,
-  },
-];
+import axios from "axios";
+import { useUser } from "../context/UserContext"; // Adjust path as needed
 
 export default function RecommendedBooks() {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!user || !user.id) {
+        console.log("No user ID available:", user);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        console.log("User object:", user);
+        console.log("User ID:", user.id);
+
+        // Get token from user object
+        const token = user.token;
+        console.log("Token from user object:", token ? "exists" : "missing");
+
+        const url = `http://localhost:8090/api/recommendations/${user.id}`;
+        console.log("Calling URL:", url);
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Recommendations data:", response.data);
+        setBooks(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching recommendations:", err);
+        if (err.response) {
+          console.error("Response status:", err.response.status);
+          console.error("Response data:", err.response.data);
+          setError(`Server error: ${err.response.status}`);
+        } else if (err.request) {
+          setError("Cannot connect to server. Is the backend running?");
+        } else {
+          setError(`Request error: ${err.message}`);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [user?.id]);
+
+  const handleBorrow = async (bookId) => {
+    try {
+      const token = user.token;
+      await axios.post(
+        `http://localhost:8090/api/emprunts/borrow?email=${user.email}&bookId=${bookId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Book borrowed successfully!");
+      setBooks(books.filter(book => book.id !== bookId));
+    } catch (err) {
+      console.error("Error borrowing book:", err);
+      alert("Failed to borrow book. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Loading recommendations...</Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+
+  if (books.length === 0) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography variant="h6" color="text.secondary">
+          No recommendations yet. Borrow some books to get personalized recommendations!
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 4, backgroundColor: "#f5f5f5" }}>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold" }}>
@@ -97,7 +142,7 @@ export default function RecommendedBooks() {
               <CardMedia
                 component="img"
                 height="220"
-                image={book.image}
+                image={book.imageUrl || "https://images.pexels.com/photos/1907784/pexels-photo-1907784.jpeg"}
                 alt={book.title}
               />
               <CardContent sx={{ flexGrow: 1 }}>
@@ -117,9 +162,9 @@ export default function RecommendedBooks() {
                     {book.title}
                   </Typography>
                   <Chip
-                    label={book.available ? "Available" : "Not Available"}
+                    label={book.available > 0 ? "Available" : "Not Available"}
                     sx={{
-                      backgroundColor: book.available ? "#00c950" : "#ff3b3b",
+                      backgroundColor: book.available > 0 ? "#00c950" : "#ff3b3b",
                       color: "white",
                     }}
                   />
@@ -138,7 +183,7 @@ export default function RecommendedBooks() {
                   color="text.secondary"
                   sx={{ mb: 1 }}
                 >
-                  {book.description}
+                  {book.description || "No description available"}
                 </Typography>
 
                 <Stack direction="row" spacing={0.5} alignItems="center">
@@ -158,7 +203,7 @@ export default function RecommendedBooks() {
                     sx={{ fontSize: 16, color: "gray", ml: 1 }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    {book.date}
+                    {book.publicationDate || "Unknown"}
                   </Typography>
                 </Stack>
 
@@ -166,7 +211,8 @@ export default function RecommendedBooks() {
                   variant="contained"
                   color="primary"
                   sx={{ mt: 2, width: "100%", borderRadius: "8px" }}
-                  disabled={!book.available}
+                  disabled={book.available <= 0}
+                  onClick={() => handleBorrow(book.id)}
                 >
                   Borrow
                 </Button>
