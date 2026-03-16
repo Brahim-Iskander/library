@@ -99,6 +99,9 @@ public class EmpruntService {
 
         emprunt.setStatus("returned");
         emprunt.setReturnDate(LocalDate.now());
+            Book book = emprunt.getBook();
+        book.setAvailable(book.getAvailable() + 1);
+        bookRepository.save(book);
 
         empruntRepository.save(emprunt);
     }

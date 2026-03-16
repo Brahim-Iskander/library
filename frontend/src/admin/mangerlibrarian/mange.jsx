@@ -35,12 +35,15 @@ const headerStyle = {
 const titleStyle = {
   fontSize: "28px",
   marginBottom: "10px",
+  textAlign: "left",
   color: "#333",
 };
 
 const descriptionStyle = {
   color: "#666",
   fontSize: "15px",
+    textAlign: "left",
+
 };
 
 const cardContainer = {

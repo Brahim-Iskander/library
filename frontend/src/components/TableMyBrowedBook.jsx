@@ -71,7 +71,7 @@ export default function DenseTable() {
         </TableHead>
 
         <TableBody>
-          {[...rows].reverse().map((row) => {
+          {[...rows].map((row) => {
             const today = new Date();
             const returnDate = new Date(row.returnDate);
             const daysDiff = getDaysDiff(row.returnDate);
