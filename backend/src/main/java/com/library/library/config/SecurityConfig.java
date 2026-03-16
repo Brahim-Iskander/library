@@ -12,27 +12,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
- @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> {})
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                "/api/users/**",
-                "/api/password/forgot-password",
-                "/api/password/reset-password",
-                "/api/emprunts/**",
-                "/api/librarian/books/**",
-                "/api/books/**",
-                "/api/admin/**" // allow public access to admin stats
- // ✅ ADD THIS
-            ).permitAll()
-            .anyRequest().authenticated()
-        );
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {
+                })
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/users/**",
+                                "/api/password/forgot-password",
+                                "/api/password/reset-password",
+                                "/api/emprunts/**",
+                                "/api/librarian/books/**",
+                                "/api/books/**",
+                                "/api/admin/**",
+                                "/api/recommendations/**" // ← ADD THIS
+                        ).permitAll());
 
-    return http.build();
-}
+        return http.build();
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
