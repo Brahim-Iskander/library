@@ -136,15 +136,6 @@ export default function PrimarySearchAppBar() {
         }}
       >
         <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search books..."
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex", gap: 5 } }}>
             <Box
@@ -167,8 +158,14 @@ export default function PrimarySearchAppBar() {
                   textAlign: "left",
                 }}
               >
-                <p style={{ fontWeight: "bold" }}> {user?.fullname}</p>
-                <p>{user?.role === "STUDENT" ? "Student" : user?.role === "LIBRARIAN" ? "Librarian" : "Admin"}</p>
+                <p style={{ fontWeight: "bold" }}> {user?.fullName}</p>
+                <p>
+                  {user?.role === "STUDENT"
+                    ? "Student"
+                    : user?.role === "LIBRARIAN"
+                      ? "Librarian"
+                      : "Admin"}
+                </p>
               </Box>
 
               <Avatar
@@ -179,8 +176,8 @@ export default function PrimarySearchAppBar() {
                   fontSize: 16,
                 }}
               >
-                {user?.fullname
-                  ? user.fullname
+                {user?.fullName
+                  ? user.fullName
                       .split(" ")
                       .map((n) => n[0])
                       .join("")

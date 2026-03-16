@@ -66,7 +66,7 @@ export default function DenseTable({ onDataLoaded }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(1, 5).map((row) => (
+            {rows.slice(-5).map((row) => (
               <TableRow
                 key={row.title + row.borrowDate}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 }, "&:hover": { backgroundColor: "#f0f0f0" } }}

@@ -62,7 +62,7 @@ export default function DenseTable({ onDataLoaded }) {
           </TableHead>
 
           <TableBody>
-            {[...rows].map((row) => {
+            {[...rows].reverse().map((row) => {
               const chipProps = getChipProps(row);
 
               return (
