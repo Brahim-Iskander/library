@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # ---------------------
+  # FRONTEND (React)
+  # ---------------------
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - mynetwork
+
+  # ---------------------
+  # BACKEND (Spring Boot)
+  # ---------------------
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    ports:
+      - "8090:8090"
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/library
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mypassword123
+    networks:
+      - mynetwork
+
+  # ---------------------
+  # DATABASE (PostgreSQL)
+  # ---------------------
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword123
+      POSTGRES_DB: library
+    volumes:
+      - db_data:/var/lib/postgresql/data   # Docker-managed volume
+    networks:
+      - mynetwork
+
+  # ---------------------
+  # PROMETHEUS
+  # ---------------------
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - mynetwork
+
+  # ---------------------
+  # GRAFANA
+  # ---------------------
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - mynetwork
+
+  # ---------------------
+  # NODE EXPORTER
+  # ---------------------
+  node_exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    networks:
+      - mynetwork
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8091:8080"   # cAdvisor UI
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: always
+    networks:
+      - mynetwork
+
+# ---------------------
+# NETWORK
+# ---------------------
+networks:
+  mynetwork:
+    driver: bridge
+
+# ---------------------
+# DOCKER MANAGED VOLUMES
+# ---------------------
+volumes:
+  db_data:
+  prometheus_data:
+  grafana_data:
