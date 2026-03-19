@@ -16,14 +16,14 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker-compose build'
+                sh 'docker compose build'
             }
         }
 
         stage('Run Containers') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
+                sh 'docker compose down'
+                sh 'docker compose up -d'
             }
         }
 
