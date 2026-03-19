@@ -12,7 +12,7 @@ pipeline {
                 git branch: 'master',
                 url: 'https://github.com/Brahim-Iskander/library.git'
             }
-        }
+        } 
 
         stage('Build Docker Image') {
             steps {
