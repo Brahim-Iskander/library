@@ -13,7 +13,6 @@ pipeline {
                 url: 'https://github.com/Brahim-Iskander/library.git'
             }
         } 
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker compose build'
