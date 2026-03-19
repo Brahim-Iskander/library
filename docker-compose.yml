@@ -11,7 +11,7 @@ services:
     volumes:
       - ./frontend:/app
     networks:
-      - mynetwork
+      - mynetwork 
 
   # ---------------------
   # BACKEND (Spring Boot)
