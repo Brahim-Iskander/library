@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # ---------------------
@@ -8,10 +8,8 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
-    volumes:
-      - ./frontend:/app
     networks:
-      - mynetwork 
+      - mynetwork
 
   # ---------------------
   # BACKEND (Spring Boot)
@@ -39,7 +37,7 @@ services:
       POSTGRES_PASSWORD: mypassword123
       POSTGRES_DB: library
     volumes:
-      - db_data:/var/lib/postgresql/data   # Docker-managed volume
+      - db_data:/var/lib/postgresql/data # Docker-managed volume
     networks:
       - mynetwork
 
@@ -84,7 +82,7 @@ services:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
     ports:
-      - "8091:8080"   # cAdvisor UI
+      - "8091:8080" # cAdvisor UI
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
