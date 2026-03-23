@@ -17,6 +17,7 @@ import com.library.library.dto.TopStudentDTO;
 @Repository
 public interface EmpruntRepository extends JpaRepository<Emprunt, Long> {
     List<Emprunt> findByUser(User user);
+    List<Emprunt> findByUserId(Long userId);
     List<Emprunt> findByUserEmail(String email);
 
     @Query("""
