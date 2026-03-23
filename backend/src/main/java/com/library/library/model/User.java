@@ -2,6 +2,7 @@ package com.library.library.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "users")
 public class User {
 
+   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,17 +28,27 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.STUDENT;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // ⭐ BORROW (emprunts)
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Emprunt> emprunts;
+    private List<Emprunt> emprunts = new ArrayList<>();
 
-    // Track when the user joined
+    // ⭐ HISTORY (VERY IMPORTANT FIX)
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BorrowHistory> borrowHistories = new ArrayList<>();
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime memberSince;
 
-    // Constructors
     public User() {
-        this.memberSince = LocalDateTime.now(); // default to current time
+        this.memberSince = LocalDateTime.now();
     }
 
     public User(String email, String password, String fullName) {

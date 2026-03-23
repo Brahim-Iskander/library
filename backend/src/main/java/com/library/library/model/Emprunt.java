@@ -1,5 +1,4 @@
 package com.library.library.model;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -7,29 +6,25 @@ import java.time.LocalDate;
 @Table(name = "emprunts")
 public class Emprunt {
 
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JoinColumn(name = "user_id")
-    
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     @Column(nullable = false)
     private LocalDate borrowDate;
 
-    @Column
     private LocalDate returnDate;
+
     @Column(nullable = false)
     private String status = "borrowed";
-
     // Constructors
     public Emprunt() {}
 
