@@ -73,7 +73,7 @@ const activeLoans = emprunts.filter(
         {/* Left: Name + Member Since */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h5" fontWeight={700}>
-            {user ? user.fullname : "John Doe"}
+            {user ? user.fullName : "John Doe"}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.25 }}>
             Member since{" "}
@@ -147,7 +147,7 @@ const activeLoans = emprunts.filter(
             {
               icon: <PersonOutlineIcon />,
               label: "Full Name",
-              value: user ? user.fullname : "",
+              value: user ? user.fullName : "",
             },
             {
               icon: <EmailOutlinedIcon />,
