@@ -3,6 +3,7 @@ package com.library.library.service;
 import com.library.library.model.Book;
 import com.library.library.model.BorrowHistory;
 import com.library.library.model.Emprunt;
+import com.library.library.model.User;
 import com.library.library.repository.BookRepository;
 import com.library.library.repository.BorrowHistoryRepository;
 import com.library.library.repository.EmpruntRepository;
@@ -99,7 +100,7 @@ public class RecommendationService {
         }
 
         // ==============================
-        // 🔹 6. POPULAR BOOKS
+        // 🔹 6. POPULAR BOOKS (UPDATED)
         // ==============================
         Set<Book> popularRecs = getPopularBooksSet();
 
@@ -132,14 +133,21 @@ public class RecommendationService {
 
         List<BorrowHistory> all = historyRepository.findAll();
 
-        return all.stream()
+        // 🔥 Group by book → collect DISTINCT users
+        Map<Book, Set<User>> bookUsersMap = all.stream()
                 .collect(Collectors.groupingBy(
                         BorrowHistory::getBook,
-                        Collectors.counting()
+                        Collectors.mapping(BorrowHistory::getUser, Collectors.toSet())
+                ));
+
+        return bookUsersMap.entrySet().stream()
+                // ✅ Keep only books borrowed by at least 3 DISTINCT users
+                .filter(entry -> entry.getValue().size() >= 3)
+                // Sort by number of users (popularity)
+                .sorted((a, b) -> Integer.compare(
+                        b.getValue().size(),
+                        a.getValue().size()
                 ))
-                .entrySet()
-                .stream()
-                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
                 .limit(10)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
