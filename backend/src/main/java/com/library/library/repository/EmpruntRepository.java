@@ -1,6 +1,7 @@
 package com.library.library.repository;
 
 
+import com.library.library.model.Book;
 import com.library.library.model.Emprunt;
 import com.library.library.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -51,5 +52,6 @@ List<TopBookDTO> findTopBorrowedBooks(Pageable pageable);
        ORDER BY COUNT(e) DESC
     """)
     List<TopStudentDTO> findTopActiveStudents(Pageable pageable);
-
+    
+boolean existsByUserAndBookAndStatusNot(User user, Book book, String status);
 }

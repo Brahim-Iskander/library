@@ -50,59 +50,72 @@ public class EmpruntService {
 
     // Borrow a book - MODIFY THIS METHOD
     @Transactional
-    public Emprunt borrowBook(String email, Long bookId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+public Emprunt borrowBook(String email, Long bookId) {
 
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (book.getAvailable() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No copies available");
-        }
+    Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
 
-        // Decrease available copies
-        book.setAvailable(book.getAvailable() - 1);
-        bookRepository.save(book);
+    // ✅ Prevent duplicate borrow (NOT returned)
+    boolean alreadyBorrowed = empruntRepository
+            .existsByUserAndBookAndStatusNot(user, book, "returned");
 
-        // Create and save Emprunt
-        Emprunt emprunt = new Emprunt();
-        emprunt.setUser(user);
-        emprunt.setBook(book);
-        emprunt.setBorrowDate(LocalDate.now());
-        emprunt.setReturnDate(LocalDate.now().plusWeeks(2)); // default return date after 2 weeks
-        empruntRepository.save(emprunt);
-
-        // ✅ NEW CODE: Save to BorrowHistory for recommendations
-        BorrowHistory history = new BorrowHistory();
-        history.setBook(book);
-        history.setUser(user);
-        borrowHistoryRepository.save(history);
-        
-        System.out.println("✅ BorrowHistory saved for user: " + user.getEmail() + ", book: " + book.getTitle());
-
-        return emprunt;
+    if (alreadyBorrowed) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You already borrowed this book");
     }
+
+    if (book.getAvailable() <= 0) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No copies available");
+    }
+
+    // decrease available copies
+    book.setAvailable(book.getAvailable() - 1);
+    bookRepository.save(book);
+
+    Emprunt emprunt = new Emprunt();
+    emprunt.setUser(user);
+    emprunt.setBook(book);
+
+    emprunt.setBorrowDate(LocalDate.now());
+
+    // ✅ KEEP YOUR DEADLINE
+    emprunt.setReturnDate(LocalDate.now().plusDays(15));
+
+    // ✅ VERY IMPORTANT
+    emprunt.setStatus("borrowed");
+
+    empruntRepository.save(emprunt);
+
+    // keep your history
+    BorrowHistory history = new BorrowHistory();
+    history.setBook(book);
+    history.setUser(user);
+    borrowHistoryRepository.save(history);
+
+    return emprunt;
+}
 
     // Return a book
-    public Emprunt returnBook(Long empruntId) {
-        Emprunt emprunt = empruntRepository.findById(empruntId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Emprunt not found"));
+   public Emprunt returnBook(Long empruntId) {
 
-        if (emprunt.getReturnDate() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Book already returned");
-        }
+    Emprunt emprunt = empruntRepository.findById(empruntId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Emprunt not found"));
 
-        emprunt.setReturnDate(LocalDate.now());
-
-        // Increase available copies
-        Book book = emprunt.getBook();
-        book.setAvailable(book.getAvailable() + 1);
-        bookRepository.save(book);
-
-        return empruntRepository.save(emprunt);
+    if ("returned".equals(emprunt.getStatus())) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Book already returned");
     }
 
+    // ✅ mark as returned
+    emprunt.setStatus("returned");
+
+    Book book = emprunt.getBook();
+    book.setAvailable(book.getAvailable() + 1);
+    bookRepository.save(book);
+
+    return empruntRepository.save(emprunt);
+}
     // Delete an emprunt
     public void deleteEmprunt(Long id) {
         Emprunt emprunt = empruntRepository.findById(id)

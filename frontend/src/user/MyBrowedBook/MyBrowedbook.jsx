@@ -22,36 +22,7 @@ export default function History() {
           </Typography>
         </Grid>
         {}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            mt: 2,
-            p: 2,
-            backgroundColor: "#fef2f2",
-            borderRadius: "20px",
-            border: "2px solid #fca5a5",
-          }}
-        >
-          <BookOpenIcon
-            style={{
-              color: "Red",
-              width: "50px",
-              height: "50px",
-            }}
-          />
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="h6" component="p" sx={{ fontWeight: "bold" }}>
-              Late Return Notice
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              You have overdue books. Please return them as soon as possible to
-              avoid late fees.{" "}
-            </Typography>
-          </Box>
-        </Box>
-
+        
         <Grid size={{ xs: 12 }}>
           <TableMyBrowedBook />
         </Grid>

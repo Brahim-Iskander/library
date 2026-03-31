@@ -29,69 +29,117 @@ export default function RecommendedBooks() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [books, setBooks] = useState([]);
+  const [myEmprunts, setMyEmprunts] = useState([]); // ✅ NEW
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [dialogType, setDialogType] = useState("success");
   const { user } = useUser();
 
+  // 📚 Fetch books
   useEffect(() => {
-    // Fetch books from API
     const fetchBooks = async () => {
       try {
         const response = await axios.get("http://localhost:8090/api/books");
-        console.log("Books fetched:", response.data);
-        // Ensure we always get an array
         setBooks(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching books:", error);
       }
     };
-
     fetchBooks();
+  }, []);
+
+  // 👤 Fetch user's borrowed books
+  useEffect(() => {
+    const fetchMyEmprunts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(
+          "http://localhost:8090/api/emprunts/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setMyEmprunts(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchMyEmprunts();
   }, []);
 
   const categories = ["All", ...new Set(books.map((b) => b.category))];
 
+  // ✅ FILTER (hide already borrowed books)
   const filteredBooks = Array.isArray(books)
     ? books.filter((book) => {
         const matchSearch = book.title
           .toLowerCase()
           .includes(search.toLowerCase());
-        const matchCategory = category === "All" || book.category === category;
-        return matchSearch && matchCategory;
+
+        const matchCategory =
+          category === "All" || book.category === category;
+
+       const isBorrowed = myEmprunts.some(
+  (e) =>
+    e.book?.id === book.id &&
+    (e.returned === false || e.status?.toUpperCase() === "BORROWED")
+);  
+
+        return matchSearch && matchCategory && !isBorrowed;
       })
     : [];
 
-  const borrowBook = async (bookId) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8090/api/emprunts/borrow",
-        null,
-        {
-          params: {
-            email: user.email,
-            bookId: bookId,
-          },
-        },
-      );
+  // 📥 Borrow book
+ const borrowBook = async (bookId) => {
+  try {
+    // +15 days return date
+    const returnDate = new Date();
+    returnDate.setDate(returnDate.getDate() + 15);
 
-      console.log("Borrow success:", response.data);
-      setDialogMessage("Book borrowed successfully!");
-      setOpenDialog(true);
-      setDialogType("success");
-      // Update UI
-      setBooks((prev) =>
-        prev.map((b) =>
-          b.id === bookId ? { ...b, available: b.available - 1 } : b,
-        ),
-      );
-    } catch (error) {
-      console.error(error.response?.data || error.message);
-      setDialogMessage("Error borrowing book");
-      setOpenDialog(true);
-      setDialogType("error");
-    }
-  };
+    await axios.post(
+      "http://localhost:8090/api/emprunts/borrow",
+      null,
+      {
+        params: {
+          email: user.email,
+          bookId: bookId,
+          returnDate: returnDate.toISOString().split("T")[0],
+        },
+      }
+    );
+
+    // ✅ FIX: instant update so it disappears without refresh
+    setMyEmprunts((prev) => [
+      ...prev,
+      {
+        book: { id: bookId },
+        returned: false,
+        status: "BORROWED",
+      },
+    ]);
+
+    // decrease stock instantly
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.id === bookId ? { ...b, available: b.available - 1 } : b
+      )
+    );
+
+    setDialogMessage("Book borrowed successfully!");
+    setDialogType("success");
+    setOpenDialog(true);
+  } catch (error) {
+    console.error(error);
+    setDialogMessage("Error borrowing book");
+    setDialogType("error");
+    setOpenDialog(true);
+  }
+};
 
   return (
     <Box sx={{ p: 4, backgroundColor: "#f5f5f5" }}>
@@ -236,57 +284,60 @@ export default function RecommendedBooks() {
           </Typography>
         )}
       </Grid>
-     <Dialog
-  open={openDialog}
-  onClose={() => setOpenDialog(false)}
-  PaperProps={{
-    sx: {
-      borderRadius: "18px",
-      padding: 2,
-      minWidth: 320,
-      textAlign: "center",
-      boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-    }
-  }}
->
-  <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-    {dialogType === "success" ? (
-      <CheckCircleOutlineIcon sx={{ fontSize: 60, color: "#00c950" }} />
-    ) : (
-      <ErrorOutlineIcon sx={{ fontSize: 60, color: "#ff3b3b" }} />
-    )}
-  </Box>
 
-  <DialogTitle
-    sx={{
-      fontWeight: "bold",
-      fontSize: 22,
-      color: dialogType === "success" ? "#00c950" : "#ff3b3b"
-    }}
-  >
-    {dialogType === "success" ? "Success" : "Error"}
-  </DialogTitle>
+      {/* ✅ SAME DESIGN DIALOG */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "18px",
+            padding: 2,
+            minWidth: 320,
+            textAlign: "center",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+          },
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+          {dialogType === "success" ? (
+            <CheckCircleOutlineIcon sx={{ fontSize: 60, color: "#00c950" }} />
+          ) : (
+            <ErrorOutlineIcon sx={{ fontSize: 60, color: "#ff3b3b" }} />
+          )}
+        </Box>
 
-  <DialogContent>
-    <Typography sx={{ fontSize: 15, color: "#555" }}>
-      {dialogMessage}
-    </Typography>
-  </DialogContent>
+        <DialogTitle
+          sx={{
+            fontWeight: "bold",
+            fontSize: 22,
+            color: dialogType === "success" ? "#00c950" : "#ff3b3b",
+          }}
+        >
+          {dialogType === "success" ? "Success" : "Error"}
+        </DialogTitle>
 
-  <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-    <Button
-      variant="contained"
-      onClick={() => setOpenDialog(false)}
-      sx={{
-        borderRadius: "10px",
-        px: 4,
-        backgroundColor: dialogType === "success" ? "#00c950" : "#ff3b3b"
-      }}
-    >
-      OK
-    </Button>
-  </DialogActions>
-</Dialog>
+        <DialogContent>
+          <Typography sx={{ fontSize: 15, color: "#555" }}>
+            {dialogMessage}
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button
+            variant="contained"
+            onClick={() => setOpenDialog(false)}
+            sx={{
+              borderRadius: "10px",
+              px: 4,
+              backgroundColor:
+                dialogType === "success" ? "#00c950" : "#ff3b3b",
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
